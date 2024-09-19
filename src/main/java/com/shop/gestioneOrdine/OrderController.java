@@ -2,6 +2,7 @@ package com.shop.gestioneOrdine;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.PatchExchange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,16 @@ aggiornare lo stato di un ordine esistente.
             return new CustomResponse<>(400, HttpStatus.BAD_REQUEST);
         }
 
+    }
+    @PatchMapping("/{id}/patch")
+    public CustomResponse<Order> changeStatusWithPatch(@PathVariable long id, @RequestBody Status status){
+        Optional<Order> orderById = orders.stream().filter(o->o.getId() == id).findFirst();
+        if(orderById.isPresent()){
+            orderById.get().setStatus(status);
+            return new CustomResponse<>(200, HttpStatus.OK, orderById.get());
+        } else{
+            return new CustomResponse<>(400, HttpStatus.BAD_REQUEST);
+        }
     }
 
     }
