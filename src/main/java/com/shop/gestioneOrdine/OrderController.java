@@ -10,23 +10,19 @@ import java.util.Optional;
 
 @RestController
 public class OrderController {
-    /*
-    L'applicazione deve permettere di creare un nuovo ordine,(FATTO)
-ottenere l'elenco degli ordini (FATTO)
-aggiornare lo stato di un ordine esistente.
-     */
+
     public List<Order> orders = new ArrayList<>();
 
-    @PostMapping("/crea-ordine/{id}")
-    public CustomResponse<Order> createOrder(@PathVariable long id, @RequestBody List<Product> productList) {
+    @PostMapping("/crea-ordine/")
+    public CustomResponse<Order> createOrder(@RequestBody List<Product> productList) {
         if (productList.isEmpty()) {
             return new CustomResponse<>(400, HttpStatus.BAD_REQUEST);
         } else {
             Order order = new Order();
             order.setListaProdotti(productList);
-            order.setId(id);
             order.setStatus(Status.IN_ELABORAZIONE);
             order.setQuantitaProdotti(productList.size());
+            order.setId(orders.size());
             orders.add(order);
             return new CustomResponse<>(200, HttpStatus.OK, order);
         }
@@ -38,10 +34,10 @@ aggiornare lo stato di un ordine esistente.
     }
 
     @PutMapping("/{id}/status")
-    public CustomResponse<Order> changeStatus(@PathVariable long id, @RequestBody Status status){
+    public CustomResponse<Order> changeStatus(@PathVariable long id, @RequestBody Order order){
         Optional<Order> orderById = orders.stream().filter(o->o.getId() == id).findFirst();
         if(orderById.isPresent()){
-            orderById.get().setStatus(status);
+            orderById.get().setStatus(order.getStatus());
             return new CustomResponse<>(200, HttpStatus.OK, orderById.get());
         } else{
             return new CustomResponse<>(400, HttpStatus.BAD_REQUEST);
